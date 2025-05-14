@@ -10,14 +10,25 @@ export async function login(formData: UserFormData) {
       password: formData.password,
     });
 
-    console.log("Respuesta completa:", response);
-
     if(response.data.user.blocked) {
       return {
         success: false,
         message: "Usuario bloqueado. Comuníquese con el administrador.",
       };
     }
+
+    if(!response.data.user.confirmed) {
+      return {
+        success: false,
+        message: "Usuario no esta confirmado. Comuníquese con el administrador.",
+      };
+    }
+
+    const { jwt, user } = response.data;
+
+    // Guardar el JWT y datos del usuario en localStorage
+    localStorage.setItem('jwt', jwt);
+    localStorage.setItem('user', JSON.stringify(user));
 
     return {
       success: true,
